@@ -1,46 +1,39 @@
-/**
- * Observable - Observable
- * Observer - Observador
- * Subscribers
- * Operator
- *
- */
-import { Observable, Observer } from "rxjs";
+// video 17
+import { Observable, Observer, interval } from "rxjs";
 
-// const obs$ = Observable.create()
+// const observer: Observer<any> = {
+//   next: (value) => console.log("Next:", value),
+//   error: (error) => console.warn("Error:", error),
+//   complete: () => console.info("Completed"),
+// };
 
-const observer: Observer<any> = {
-  next: (value) => console.log("Next:", value),
-  error: (error) => console.warn("Error:", error),
-  complete: () => console.info("Completed"),
-};
+// const source = interval(1000);
+// const subscribe = source.subscribe((val) => console.log(val));
 
-const hola: string = "Hola";
+const interval$ = new Observable<number>((subscriber) => {
+  // Create Counter - 1,2,3,4,5,...
+  let count = 0;
 
-const obs$ = new Observable<string>((subs) => {
-  subs.next(hola);
-  subs.next("Mundo");
+  const interval = setInterval(() => {
+    count++;
+    subscriber.next(count);
+    console.log("counting");
+  }, 1000);
 
-  subs.next("Hola");
-  subs.next("Mundo");
-
-  // const a = undefined;
-  // a.nombre = "Mario";
-
-  subs.complete();
-
-  //   it doesn't execute - after complete
-  subs.next("Hola");
-  subs.next("Mundo");
+  //  'return' is called with unsubscribe()
+  return () => {
+    clearInterval(interval);
+    console.log("Interval destroyed");
+  };
 });
 
-obs$.subscribe(observer);
+const subscription = interval$.subscribe((num) => console.log("Num:", num));
+const subs2 = interval$.subscribe((num) => console.log("Num:", num));
+const subs3 = interval$.subscribe((num) => console.log("Num:", num));
 
-// obs$.subscribe((resp) => console.log(resp));
-// obs$.subscribe(console.log);
-
-// obs$.subscribe(
-//   (value) => console.log("next", value),
-//   (error) => console.warn("error", error),
-//   () => console.info("Completed")
-// );
+setTimeout(() => {
+  subscription.unsubscribe();
+  subs2.unsubscribe();
+  subs3.unsubscribe();
+  console.log("Completed timeout");
+}, 5000);
