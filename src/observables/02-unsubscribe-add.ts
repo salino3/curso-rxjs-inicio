@@ -1,4 +1,4 @@
-// video 18
+// video 17
 import { Observable, Observer, Subscription, interval } from "rxjs";
 
 const observer: Observer<any> = {
@@ -25,7 +25,6 @@ const interval$ = new Observable<number>((subscriber) => {
   }, 2500);
 
   //  'return' is called with unsubscribe() or with complete()
-  //  good practice after complete() execute unsubscribe() too, save resources
   return () => {
     clearInterval(interval);
     console.log("Interval destroyed");
