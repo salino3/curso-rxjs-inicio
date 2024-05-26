@@ -1,5 +1,5 @@
 // video 18
-import { Observable, Observer, Subscription, interval } from "rxjs";
+import { Observable, Observer, Subject, Subscription, interval } from "rxjs";
 
 const observer: Observer<any> = {
   next: (value) => console.log("Next:", value),
@@ -7,47 +7,27 @@ const observer: Observer<any> = {
   complete: () => console.info("Completed"),
 };
 
-// const source = interval(1000);
-// const subscribe = source.subscribe((val) => console.log(val));
+const interval$ = new Observable<number>(subs => {
 
-const interval$ = new Observable<number>((subscriber) => {
-  // Create Counter - 1,2,3,4,5,...
-  let count = 0;
-
-  const interval = setInterval(() => {
-    count++;
-    subscriber.next(count);
-    console.log("counting");
-  }, 1000);
-
-  setTimeout(() => {
-    subscriber.complete();
-  }, 2500);
-
-  //  'return' is called with unsubscribe() or with complete()
-  //  good practice after complete() execute unsubscribe() too, save resources
+  const intervaleID = setInterval(() => subs.next(Math.random()), 2000)
   return () => {
-    clearInterval(interval);
-    console.log("Interval destroyed");
-  };
+    clearInterval(intervaleID)
+  }
 });
 
-// const subscription = interval$.subscribe((num) => console.log("Num:", num));
-const subs1 = interval$.subscribe(observer);
-const subs2 = interval$.subscribe(observer);
-const subs3 = interval$.subscribe(observer);
+// const subs1 = interval$.subscribe( random => console.log("rnd1", random)) 
+// const subs2 = interval$.subscribe( random => console.log("rnd2", random)) 
 
-// subs1.add(subs2)
+/**
+ *  1- Casteo multiple
+ * 2- it'e a Observer
+ * 3- We can send a subject
+ * 4- Next, error and complete
+ */
 
-const subscription = new Subscription();
-subscription.add(subs1);
-subscription.add(subs2);
-subscription.add(subs3);
+const subject$ = new Subject()
+interval$.subscribe(subject$)
 
-setTimeout(() => {
-  //   subs1.unsubscribe();
-  //   subs2.unsubscribe();
-  //   subs3.unsubscribe();
-  subscription.unsubscribe();
-  console.log("Completed timeout");
-}, 5000);
+const subs1 = subject$.subscribe( random => console.log("rnd1", random)) 
+const subs2 = subject$.subscribe( random => console.log("rnd2", random)) 
+
